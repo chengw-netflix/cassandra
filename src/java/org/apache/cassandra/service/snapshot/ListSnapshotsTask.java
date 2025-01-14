@@ -58,6 +58,9 @@ public class ListSnapshotsTask implements Callable<Map<String, TabularData>>
         boolean includeEphemeral = options != null && Boolean.parseBoolean(options.getOrDefault("include_ephemeral", "false"));
         String selectedKeyspace = options != null ? options.get("keyspace") : null;
         String selectedTable = options != null ? options.get("table") : null;
+
+        Set<String> selectedTables = selectedTable != null ? new HashSet<>(List.of(selectedTable.split(","))) : new HashSet<>();
+
         String selectedSnapshotName = options != null ? options.get("snapshot") : null;
 
         return s -> {
@@ -73,7 +76,7 @@ public class ListSnapshotsTask implements Callable<Map<String, TabularData>>
             if (selectedKeyspace != null && !s.getKeyspaceName().equals(selectedKeyspace))
                 return false;
 
-            return selectedTable == null || s.getTableName().equals(selectedTable);
+            return selectedTable == null || selectedTables.contains(s.getTableName());
         };
     }
 
